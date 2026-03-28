@@ -57,6 +57,12 @@ def get_output_dir():
 
 def cmd_build_dataset(args):
     """Build training dataset from annotated rules."""
+    from licensedcode.ml_required_phrases.fast_dataset import build_fast_dataset
+    from licensedcode.models import rules_data_dir
+    from licensedcode.ml_required_phrases.dataset import save_dataset
+
+    output_dir = get_output_dir()
+    dataset_path = os.path.join(output_dir, 'dataset.json')
     rules_dir = args.rules_dir or rules_data_dir
 
     print("\n" + "=" * 60)
@@ -134,8 +140,12 @@ def cmd_predict(args):
     """Run predictions on unannotated rules."""
     from licensedcode.ml_required_phrases.train import load_model
     from licensedcode.ml_required_phrases.predict import suggest_required_phrases, save_suggestions
-    rules_dir = args.rules_dir or rules_data_dir
+    from licensedcode.models import rules_data_dir
 
+    output_dir = get_output_dir()
+    model_path = os.path.join(output_dir, 'model.pkl')
+    suggestions_path = os.path.join(output_dir, 'suggestions.json')
+    rules_dir = args.rules_dir or rules_data_dir
     if not os.path.exists(model_path):
         print("Model not found. Run 'train' first.")
         print(f"Expected: {model_path}")
