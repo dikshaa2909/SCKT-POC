@@ -1,0 +1,6 @@
+numpy
+click
+scikit-learn
+attrs
+flask
+jinja2
