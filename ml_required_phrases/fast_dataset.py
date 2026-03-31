@@ -168,7 +168,7 @@ def build_fast_dataset(rules_dir=None, max_rules=None, verbose=True):
 
     rule_files = sorted(rules_dir.glob('*.RULE'))
     if verbose:
-        print(f"  Found {len(rule_files)} .RULE files")
+        print(f"Found {len(rule_files)} .RULE files")
 
     for rule_file in rule_files:
         stats['total_rules_scanned'] += 1
@@ -229,8 +229,8 @@ def build_fast_dataset(rules_dir=None, max_rules=None, verbose=True):
         }
         examples.append(example)
 
-        if verbose and stats['total_rules_scanned'] % 500 == 0:
-            print(f"  Scanned {stats['total_rules_scanned']} rules (found {stats['rules_with_markers']} with markers)...")
+    if verbose:
+        print(f"Scanned {stats['total_rules_scanned']} rules (found {stats['rules_with_markers']} with markers)...")
 
     if verbose:
         print(f"\n  Dataset build complete:")

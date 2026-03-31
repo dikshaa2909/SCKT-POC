@@ -29,21 +29,17 @@ from pathlib import Path
 
 import numpy as np
 
-from licensedcode.models import load_rules
-from licensedcode.models import rules_data_dir
-from licensedcode.stopwords import STOPWORDS
-from licensedcode.tokenize import REQUIRED_PHRASE_CLOSE
-from licensedcode.tokenize import REQUIRED_PHRASE_OPEN
-from licensedcode.tokenize import required_phrase_tokenizer
+# Lazy import helpers - avoid importing licensedcode.models at module level
+# because it triggers the full license index build which takes minutes.
 
-from licensedcode.ml_required_phrases.dataset import get_normalized_tokens_for_ml
-from licensedcode.ml_required_phrases.alignment import align_predictions_to_spans
-from licensedcode.ml_required_phrases.postfilter import classify_suggestion
-from licensedcode.ml_required_phrases.postfilter import DEFAULT_T_HIGH
-from licensedcode.ml_required_phrases.postfilter import DEFAULT_T_LOW
+from .fast_dataset import simple_tokenize
+from .alignment import align_predictions_to_spans
+from .postfilter import classify_suggestion
+from .postfilter import DEFAULT_T_HIGH
+from .postfilter import DEFAULT_T_LOW
 
 # We need the same label list used in train
-from licensedcode.ml_required_phrases.train import LABEL_LIST, ID_TO_LABEL
+from .train import LABEL_LIST, ID_TO_LABEL
 
 
 def predict_bio_labels_sklearn(tokens, model_bundle):
@@ -57,8 +53,8 @@ def predict_bio_labels_sklearn(tokens, model_bundle):
     Returns:
         (pred_labels, pred_probs)
     """
-    from licensedcode.ml_required_phrases.train import featurize_example
-    from licensedcode.ml_required_phrases.train import features_to_vector
+    from .train import featurize_example
+    from .train import features_to_vector
 
     clf = model_bundle['classifier']
     vocab = model_bundle['vocab']
@@ -183,7 +179,7 @@ def suggest_for_rule(rule, model_bundle, config=None):
     if not text or not text.strip():
         return []
 
-    tokens = get_normalized_tokens_for_ml(text)
+    tokens = simple_tokenize(text)
     if not tokens or len(tokens) < 3:
         return []
 
@@ -226,7 +222,7 @@ def suggest_for_rule(rule, model_bundle, config=None):
 
 def suggest_required_phrases(
     model_bundle,
-    rules_data_dir=rules_data_dir,
+    rules_data_dir=None,
     config=None,
     max_rules=None,
     verbose=True,
@@ -257,7 +253,7 @@ def suggest_required_phrases(
         },
     }
 
-    from licensedcode.ml_required_phrases.fast_dataset import load_rules_fast
+    from .fast_dataset import load_rules_fast
     rules = load_rules_fast(rules_dir=rules_data_dir, max_rules=max_rules)
     processed = 0
 
@@ -287,7 +283,7 @@ def suggest_required_phrases(
         if getattr(rule, 'skip_for_required_phrase_generation', False):
             continue
 
-        tokens = get_normalized_tokens_for_ml(text)
+        tokens = simple_tokenize(text)
         if len(tokens) < 3:
             continue
 
@@ -320,11 +316,11 @@ def suggest_required_phrases(
                 results['stats']['rejected_count'] += 1
 
         if verbose and processed % 500 == 0:
-            print(f"  Processed {processed} eligible rules...")
+            print(f"Processed {processed} eligible rules...")
 
     if verbose:
         stats = results['stats']
-        print(f"\n{'='*60}")
+        print(f"{'='*60}")
         print(f"ML SUGGESTION PIPELINE RESULTS")
         print(f"{'='*60}")
         print(f"Total rules scanned: {stats['total_rules']}")
@@ -398,7 +394,14 @@ def save_suggestions(results, output_path):
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Save to standard suggestions.json
     with open(output_path, 'w') as f:
+        json.dump(serializable, f, indent=2, default=str)
+    
+    # Also save to the "GSOC" name seen in proposal screenshots
+    gsoc_path = output_path.parent / 'ml_required_phrases_suggestions.json'
+    with open(gsoc_path, 'w') as f:
         json.dump(serializable, f, indent=2, default=str)
 
     return output_path

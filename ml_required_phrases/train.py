@@ -206,21 +206,35 @@ def train_sklearn_model(dataset, test_ratio=0.2, seed=42, verbose=True, C=1.0):
     """
     Train a fast token classifier without requiring torch or sklearn.
     """
-    from licensedcode.ml_required_phrases.dataset import split_dataset
-
+    from collections import defaultdict
+    import random
+    rng = random.Random(seed)
     examples = dataset['examples']
+    by_expression = defaultdict(list)
+    for ex in examples:
+        by_expression[ex.get('license_expression', '')].append(ex)
+    expressions = list(by_expression.keys())
+    rng.shuffle(expressions)
+    total = len(examples)
+    test_target = int(total * test_ratio)
+    test_examples, train_examples, test_count = [], [], 0
+    for expr in expressions:
+        group = by_expression[expr]
+        if test_count < test_target:
+            test_examples.extend(group)
+            test_count += len(group)
+        else:
+            train_examples.extend(group)
+
     if not examples:
         raise ValueError("No training examples found in dataset")
-
-    train_examples, test_examples = split_dataset(dataset, test_ratio, seed)
-
     if verbose:
-        print(f"  Training set: {len(train_examples)} examples")
-        print(f"  Test set: {len(test_examples)} examples")
+        print(f"Training set: {len(train_examples)} examples")
+        print(f"Test set: {len(test_examples)} examples")
 
     # Extract features for all training tokens
     if verbose:
-        print("  Extracting features...")
+        print("Extracting features...")
 
     all_train_features = []
     all_train_labels = []
@@ -234,22 +248,22 @@ def train_sklearn_model(dataset, test_ratio=0.2, seed=42, verbose=True, C=1.0):
     # Build vocabulary
     vocab = build_vocab(all_train_features, min_count=2)
     if verbose:
-        print(f"  Feature vocabulary size: {len(vocab)}")
+        print(f"Feature vocabulary size: {len(vocab)}")
 
     # Vectorize
     X_train = np.array([features_to_vector(f, vocab) for f in all_train_features])
     y_train = np.array(all_train_labels)
 
     if verbose:
-        print(f"  Training matrix: {X_train.shape}")
-        print("  Training NumpyClassifier...")
+        print(f"Training matrix: {X_train.shape}")
+        print("Training LogisticRegression...")
 
     clf = NumpyLogisticRegression(max_iter=300, learning_rate=0.5)
     clf.fit(X_train, y_train)
 
     # Evaluate on test set
     if verbose:
-        print("  Evaluating...")
+        print("Evaluating...")
 
     all_test_features = []
     all_test_labels = []
@@ -365,14 +379,29 @@ def train_deberta_model(dataset, test_ratio=0.2, seed=42, verbose=True, C=1.0):
             "For quick prototype demo, use mode='sklearn' instead."
         )
 
-    from licensedcode.ml_required_phrases.dataset import split_dataset
+    from collections import defaultdict
+    import random as _random
+    _rng = _random.Random(seed)
+    _examples = dataset['examples']
+    _by_expression = defaultdict(list)
+    for _ex in _examples:
+        _by_expression[_ex.get('license_expression', '')].append(_ex)
+    _expressions = list(_by_expression.keys())
+    _rng.shuffle(_expressions)
+    _total = len(_examples)
+    _test_target = int(_total * test_ratio)
+    test_examples, train_examples, _test_count = [], [], 0
+    for _expr in _expressions:
+        _group = _by_expression[_expr]
+        if _test_count < _test_target:
+            test_examples.extend(_group)
+            _test_count += len(_group)
+        else:
+            train_examples.extend(_group)
     import tempfile
 
-    examples = dataset['examples']
-    if not examples:
+    if not _examples:
         raise ValueError("No training examples found in dataset")
-
-    train_examples, test_examples = split_dataset(dataset, test_ratio, seed)
 
     if verbose:
         print(f"  Training set: {len(train_examples)} examples")
@@ -562,8 +591,8 @@ def save_model(model_bundle, output_path):
         json.dump(bundle_info, f, indent=2)
 
     if True:  # verbose
-        print(f"  Model saved to: {output_path}")
-        print(f"  Metrics saved to: {metrics_path}")
+        print(f"Model saved to: {output_path}")
+        print(f"Metrics saved to: {metrics_path}")
 
 
 def load_model(model_path):

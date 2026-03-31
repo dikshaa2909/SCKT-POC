@@ -34,35 +34,37 @@
   pip install -e ".[dev]"
   ```
 
-> **For reviewers:** The core pipeline orchestrator is in [`ml_required_phrases/run_pipeline.py`](ml_required_phrases/run_pipeline.py). To see the results without running the training or prediction jobs yourself, view the pre-computed outputs in `demo_results/` or simply launch the review UI using the included JSON data.
+> **For reviewers:** The core pipeline orchestrator is in [`ml_required_phrases/run_pipeline.py`](ml_required_phrases/run_pipeline.py). To see the results without running the training or prediction jobs yourself, view the pre-computed outputs in `tmp/ml_required_phrases/` or simply launch the review UI using the included JSON data.
 
 ### Steps
 
 **Step 1: Setup PoC in your ScanCode clone**
 ```bash
-# Point the setup script to your local scancode-toolkit directory
-./setup_local.sh ../scancode-toolkit
+# Copy the PoC files into your local scancode-toolkit src directory
+cp -r gsoc-ml-poc/ml_required_phrases/ src/licensedcode/
 ```
 
 **Step 2: Build dataset and train the model**
 ```bash
-# Navigate to the ST root with the newly copied PoC modules
-cd ../scancode-toolkit
-
-# Note: We use ST's virtual environment python to run the pipeline
-./venv/bin/python src/licensedcode/ml_required_phrases/run_pipeline.py build-dataset --rules-dir demo_rules/
-./venv/bin/python src/licensedcode/ml_required_phrases/run_pipeline.py train --mode sklearn
+# Note: We use ST's virtual environment python to run the pipeline as a module
+./venv/bin/python -m licensedcode.ml_required_phrases.run_pipeline build-dataset --max-rules 1000
+./venv/bin/python -m licensedcode.ml_required_phrases.run_pipeline train --mode sklearn
 ```
 
 **Step 3: Run prediction and safety gates**
 ```bash
-./venv/bin/python src/licensedcode/ml_required_phrases/run_pipeline.py predict --rules-dir demo_rules/
+./venv/bin/python -m licensedcode.ml_required_phrases.run_pipeline predict --max-rules 1000
 ```
-Predictions bounded by the 5-Gate Safety System are saved to `demo_results/suggestions.json`.
+Predictions bounded by the 5-Gate Safety System are saved to `tmp/ml_required_phrases/suggestions.json`.
 
-**Step 4 (optional): Open in Web Review UI**
+**Step 4: Open in Web Review UI**
 ```bash
-./venv/bin/python src/licensedcode/ml_required_phrases/run_pipeline.py review-ui --port 8089
+./venv/bin/python -m licensedcode.ml_required_phrases.run_pipeline review-ui --port 8089
+```
+
+**Note:** You can also run the full end-to-end pipeline in one command:
+```bash
+./venv/bin/python -m licensedcode.ml_required_phrases.run_pipeline run-all --max-rules 1000
 ```
 
 ## Architecture
