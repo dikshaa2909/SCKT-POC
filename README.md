@@ -1,12 +1,12 @@
 # NLP → Required Phrase Marking Pipeline (Proof of Concept)
 
-> 🎓 **GSoC 2026 Proof-of-Concept** for [Project: ML-Based Required Phrase Marking](https://github.com/aboutcode-org/aboutcode/wiki/GSOC-2026-project-ideas#scancode-toolkit-project-ideas)
+> **GSoC 2026 Proof-of-Concept** for [Project: ML-Based Required Phrase Marking](https://github.com/aboutcode-org/aboutcode/wiki/GSOC-2026-project-ideas#scancode-toolkit-project-ideas)
 
 This repository demonstrates an end-to-end machine learning pipeline designed to resolve the "required phrase" automation problem in **ScanCode Toolkit**. By leveraging DeBERTa-v3 token classification and a 5-gate safety system, we achieve high-precision license rule enhancement.
 
 ---
 
-## 🖥 **Interactive Human-in-the-Loop Review System**
+##  **Interactive Human-in-the-Loop Review System**
 The core of this POC is a production-ready review interface that bridges the gap between AI predictions and curate-approved license rules.
 
 ### 1. Main Review Dashboard
@@ -32,49 +32,31 @@ Displays a summary of suggestions that were automatically or manually rejected b
 
 ---
 
-## 🛠 **System Architecture**
+## **System Architecture**
 
 ```mermaid
 flowchart LR
-    subgraph Gen [Generation]
-        A1[Rule Corpus] --> A2[fast_dataset.py]
-        A2 --> A3[Labeling Engine]
-        A3 --> A4[dataset.json]
-    end
+    A["<b>1. Dataset Generation</b><br/>Rule Corpus (36K files)<br/>├─ fast_dataset.py<br/>├─ Labeling Engine (BIO)<br/>└─ dataset.json"]
+    
+    B["<b>2. ML Training</b><br/>train.py (HF Trainer)<br/>├─ DeBERTa-v3 Target<br/>└─ model_checkpoint"]
+    
+    C["<b>3. Inference & Gating</b><br/>predict.py (Batch Loop)<br/>├─ alignment.py (Tokens)<br/>├─ postfilter.py (Safety)<br/>└─ Confidence Tiling"]
+    
+    D["<b>4. Human-in-the-Loop</b><br/>review.py (Web-based UI)<br/>├─ Auto-Apply Queue<br/>├─ Review Queue<br/>└─ Atomic writer.py"]
 
-    subgraph Train [Training]
-        B1[train.py] --> B2[DeBERTa-v3]
-        B2 --> B3[checkpoint]
-    end
+    A --> B
+    B --> C
+    C --> D
 
-    subgraph Gate [Inference & Gating]
-        C1[predict.py] --> C2[alignment.py]
-        C2 --> C3[postfilter.py]
-        C3 --> C4[Confidence Gating]
-    end
-
-    subgraph HITL [Review]
-        F1{Tipping} --> F2[Auto-Apply]
-        F1 --> F3[Review Queue]
-        F1 --> F4[Rejected]
-        
-        F3 --> F5[review.py UI]
-        F5 --> F6[writer.py]
-        F6 --> F7[Rule Update]
-    end
-
-    A4 --> B1
-    B3 --> C1
-    C4 --> F1
-
-    style F7 fill:#000,color:#fff
-    style B2 fill:#f9f
-    style C3 stroke-dasharray: 5 5
+    style A fill:none,stroke:#000
+    style B fill:none,stroke:#000
+    style C fill:none,stroke:#000
+    style D fill:#000,color:#fff
 ```
 
 ---
 
-## 🚀 **How to Run**
+## **How to Run**
 
 ### **Prerequisites**
 - **Python 3.10+**
@@ -114,7 +96,7 @@ cp -r gsoc-ml-poc/ml_required_phrases/ src/licensedcode/
 
 ---
 
-## 🤝 **Author & Contact**
+## **Author & Contact**
 **Diksha Deware** — GSoC 2026 Applicant
 [GitHub](https://github.com/dikshaa2909) | [Proposal Repository](https://github.com/dikshaa2909/SCKT-POC)
 Applying for GSoC 2026 with the **AboutCode** community.
