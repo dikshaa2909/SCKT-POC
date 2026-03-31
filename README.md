@@ -1,26 +1,21 @@
 # NLP → Required Phrase Marking Pipeline (Proof of Concept)
 
-> GSoC 2026 proof-of-concept for [Project: ML-Based Required Phrase Marking]([https://github.com/dikshaa2909/GSoC-2026-ScanCode-Proposal](https://github.com/aboutcode-org/aboutcode/wiki/GSOC-2026-project-ideas#scancode-toolkit-project-ideas))
+> 🎓 GSoC 2026 proof-of-concept for [Project: ML-Based Required Phrase Marking](https://github.com/aboutcode-org/aboutcode/wiki/GSOC-2026-project-ideas#scancode-toolkit-project-ideas)
 
-## Results
+## 🖥 Human-in-the-Loop Review UI
+This interactive review system allows maintainers to validate ML predictions natively. It bridges the gap between AI-driven extraction and production-ready license rules.
 
-### Scenario 1: Unmarked Custom License
+### 1. Main Review Dashboard
+Overview of predicted phrases across the rule corpus, allowing for bulk status verification.
+![Main Review Dashboard](integration_preview/screenshots/review_ui_main.jpeg)
 
-| Original ScanCode Output | ML Suggested Marker |
-|---|---|
-| ![Original Placeholder](screenshots/scenario1_original.png) | ![Fixed Placeholder](screenshots/scenario1_fixed.png) |
+### 2. Detailed Phrase Validation
+Granular side-by-side view for rule verification, where human curators can accept, reject, or edit individual suggestions.
+![Detailed Phrase Validation](integration_preview/screenshots/review_ui_detail.jpeg)
 
-### Scenario 2: False Positive (URL Match)
-
-| Original ScanCode Output | ML Suggested Marker |
-|---|---|
-| ![Original Placeholder](screenshots/scenario2_original.png) | ![Fixed Placeholder](screenshots/scenario2_fixed.png) |
-
-### Scenario 3: Complex Multi-License Rule
-
-| Original ScanCode Output | ML Suggested Marker |
-|---|---|
-| ![Original Placeholder](screenshots/scenario3_original.png) | ![Fixed Placeholder](screenshots/scenario3_fixed.png) |
+### 3. Rejected Suggestions
+Visualization of phrases filtered by the 5-Gate Safety System or manual rejection during the review phase.
+![Rejected Suggestions](integration_preview/screenshots/rejected_ui.jpeg)
 
 ## How to run
 
