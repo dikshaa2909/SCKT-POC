@@ -4,13 +4,23 @@
 
 ## Results
 
-### Phase F: Interactive Review UI
+### Scenario 1: Unmarked Custom License
 
-| Rule Input | ML Suggestion |
+| Original ScanCode Output | ML Suggested Marker |
 |---|---|
-| ![Input Placeholder](screenshots/pipeline_input.png) | ![Prediction Placeholder](screenshots/pipeline_ui.png) |
+| ![Original Placeholder](screenshots/scenario1_original.png) | ![Fixed Placeholder](screenshots/scenario1_fixed.png) |
 
-*(Note: Add screenshots of your working pipeline to the `screenshots/` folder to display them above)*
+### Scenario 2: False Positive (URL Match)
+
+| Original ScanCode Output | ML Suggested Marker |
+|---|---|
+| ![Original Placeholder](screenshots/scenario2_original.png) | ![Fixed Placeholder](screenshots/scenario2_fixed.png) |
+
+### Scenario 3: Complex Multi-License Rule
+
+| Original ScanCode Output | ML Suggested Marker |
+|---|---|
+| ![Original Placeholder](screenshots/scenario3_original.png) | ![Fixed Placeholder](screenshots/scenario3_fixed.png) |
 
 ## How to run
 
@@ -30,25 +40,29 @@
 
 **Step 1: Setup PoC in your ScanCode clone**
 ```bash
-# This copies the ML modules into your scancode-toolkit's src/ directory
-./setup_local.sh
+# Point the setup script to your local scancode-toolkit directory
+./setup_local.sh ../scancode-toolkit
 ```
 
 **Step 2: Build dataset and train the model**
 ```bash
-python3 src/licensedcode/ml_required_phrases/run_pipeline.py build-dataset --rules-dir demo_rules/
-python3 src/licensedcode/ml_required_phrases/run_pipeline.py train --mode sklearn
+# Navigate to the ST root with the newly copied PoC modules
+cd ../scancode-toolkit
+
+# Note: We use ST's virtual environment python to run the pipeline
+./venv/bin/python src/licensedcode/ml_required_phrases/run_pipeline.py build-dataset --rules-dir demo_rules/
+./venv/bin/python src/licensedcode/ml_required_phrases/run_pipeline.py train --mode sklearn
 ```
 
 **Step 3: Run prediction and safety gates**
 ```bash
-python3 src/licensedcode/ml_required_phrases/run_pipeline.py predict --rules-dir demo_rules/
+./venv/bin/python src/licensedcode/ml_required_phrases/run_pipeline.py predict --rules-dir demo_rules/
 ```
 Predictions bounded by the 5-Gate Safety System are saved to `demo_results/suggestions.json`.
 
 **Step 4 (optional): Open in Web Review UI**
 ```bash
-python3 src/licensedcode/ml_required_phrases/run_pipeline.py review-ui --port 8089
+./venv/bin/python src/licensedcode/ml_required_phrases/run_pipeline.py review-ui --port 8089
 ```
 
 ## Architecture
