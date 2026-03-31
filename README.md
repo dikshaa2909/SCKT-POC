@@ -1,12 +1,12 @@
 # NLP → Required Phrase Marking Pipeline (Proof of Concept)
 
-> **GSoC 2026 Proof-of-Concept** for [Project: ML-Based Required Phrase Marking](https://github.com/aboutcode-org/aboutcode/wiki/GSOC-2026-project-ideas#scancode-toolkit-project-ideas)
+> 🎓 **GSoC 2026 Proof-of-Concept** for [Project: ML-Based Required Phrase Marking](https://github.com/aboutcode-org/aboutcode/wiki/GSOC-2026-project-ideas#scancode-toolkit-project-ideas)
 
 This repository demonstrates an end-to-end machine learning pipeline designed to resolve the "required phrase" automation problem in **ScanCode Toolkit**. By leveraging DeBERTa-v3 token classification and a 5-gate safety system, we achieve high-precision license rule enhancement.
 
 ---
 
-## 🖥 **Interactive Review System**
+## 🖥 **Interactive Human-in-the-Loop Review System**
 The core of this POC is a production-ready review interface that bridges the gap between AI predictions and curate-approved license rules.
 
 ### 1. Main Review Dashboard
@@ -32,62 +32,49 @@ Displays a summary of suggestions that were automatically or manually rejected b
 
 ---
 
-## **System Architecture**
+## 🛠 **System Architecture**
 
 ```mermaid
-flowchart TD
-    subgraph PhaseA [Phase A: Dataset Generation]
-        direction TB
-        A1[Rule Corpus<br/>36,482 .RULE files] --> A2[fast_dataset.py<br/>Regex Parser]
-        A2 --> A3[Labeling Engine<br/>BIO Token Labeling]
-        A3 --> A4[dataset.json<br/>Supervised Data]
+flowchart LR
+    subgraph Gen [Generation]
+        A1[Rule Corpus] --> A2[fast_dataset.py]
+        A2 --> A3[Labeling Engine]
+        A3 --> A4[dataset.json]
     end
 
-    subgraph PhaseB [Phase B: ML Training]
-        direction TB
-        B1[train.py<br/>HF Trainer] --> B2[DeBERTa-v3<br/>Production Target]
-        B2 --> B3[model_checkpoint<br/>Fine-tuned Weights]
+    subgraph Train [Training]
+        B1[train.py] --> B2[DeBERTa-v3]
+        B2 --> B3[checkpoint]
     end
 
-    subgraph PhaseCE [Phase C-E: Inference & Safety Gates]
-        direction TB
-        C1[predict.py<br/>Batch Inference] --> C2[alignment.py<br/>SCTK Token Alignment]
-        C2 --> C3[postfilter.py<br/>5 Safety Gates]
-        subgraph Gates [5 Safety Gates]
-            G1[1. Ignorable Overlap]
-            G2[2. Genericity Filter]
-            G3[3. Rule Constraints]
-            G4[4. Marker Conflict]
-            G5[5. Min Informativeness]
-        end
-        C3 --> Gates
-        Gates --> C4[Confidence Gating<br/>T_high=0.95]
+    subgraph Gate [Inference & Gating]
+        C1[predict.py] --> C2[alignment.py]
+        C2 --> C3[postfilter.py]
+        C3 --> C4[Confidence Gating]
     end
 
-    subgraph PhaseF [Phase F: Human-in-the-Loop]
-        direction TB
-        F1{Confidence Tipping}
-        F1 -->|T >= 0.95| F2[Auto-Apply Bucket]
-        F1 -->|0.80 - 0.95| F3[Review Queue]
-        F1 -->|< 0.80| F4[Rejected Bucket]
+    subgraph HITL [Review]
+        F1{Tipping} --> F2[Auto-Apply]
+        F1 --> F3[Review Queue]
+        F1 --> F4[Rejected]
         
-        F3 --> F5[review.py Web UI<br/>Accept/Reject/Edit]
-        F5 --> F6[writer.py<br/>Atomic Write .bak]
-        F6 --> F7[ScanCode Rule Update<br/>scancode-reindex-licenses]
+        F3 --> F5[review.py UI]
+        F5 --> F6[writer.py]
+        F6 --> F7[Rule Update]
     end
 
     A4 --> B1
     B3 --> C1
     C4 --> F1
 
-    style F7 fill:#000,color:#fff,stroke:#333,stroke-width:2px
-    style B2 fill:#f9f,stroke:#333
-    style C3 fill:#fff,stroke:#333,stroke-dasharray: 5 5
+    style F7 fill:#000,color:#fff
+    style B2 fill:#f9f
+    style C3 stroke-dasharray: 5 5
 ```
 
 ---
 
-## **How to Run**
+## 🚀 **How to Run**
 
 ### **Prerequisites**
 - **Python 3.10+**
@@ -127,7 +114,7 @@ cp -r gsoc-ml-poc/ml_required_phrases/ src/licensedcode/
 
 ---
 
-## **Author & Contact**
+## 🤝 **Author & Contact**
 **Diksha Deware** — GSoC 2026 Applicant
 [GitHub](https://github.com/dikshaa2909) | [Proposal Repository](https://github.com/dikshaa2909/SCKT-POC)
 Applying for GSoC 2026 with the **AboutCode** community.
