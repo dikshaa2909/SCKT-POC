@@ -1,12 +1,12 @@
 # NLP → Required Phrase Marking Pipeline (Proof of Concept)
 
-> 🎓 **GSoC 2026 Proof-of-Concept** for [Project: ML-Based Required Phrase Marking](https://github.com/aboutcode-org/aboutcode/wiki/GSOC-2026-project-ideas#scancode-toolkit-project-ideas)
+> **GSoC 2026 Proof-of-Concept** for [Project: ML-Based Required Phrase Marking](https://github.com/aboutcode-org/aboutcode/wiki/GSOC-2026-project-ideas#scancode-toolkit-project-ideas)
 
 This repository demonstrates an end-to-end machine learning pipeline designed to resolve the "required phrase" automation problem in **ScanCode Toolkit**. By leveraging DeBERTa-v3 token classification and a 5-gate safety system, we achieve high-precision license rule enhancement.
 
 ---
 
-## 🖥 **Interactive Human-in-the-Loop Review System**
+## 🖥 **Interactive Review System**
 The core of this POC is a production-ready review interface that bridges the gap between AI predictions and curate-approved license rules.
 
 ### 1. Main Review Dashboard
@@ -23,7 +23,16 @@ Displays a summary of suggestions that were automatically or manually rejected b
 
 ---
 
-## 🛠 **System Architecture**
+##  **Key Features**
+- **Token Classification (BIO tagging)**: High-accuracy sequence labeling for required phrases.
+- **5-Gate Safety System**: Automated filtering of URLs, generic terms, and overlapping markers.
+- **Confidence Tiling**: Dynamic bucketing into Auto-Apply, Review, and Rejected queues.
+- **Atomic File Operations**: Safe, verified updates to core license rules with `.bak` backups.
+- **Scalable Architecture**: Flexible design supporting both sklearn-based baselines and DeBERTa-v3 production models.
+
+---
+
+## **System Architecture**
 
 ```mermaid
 flowchart TD
@@ -78,7 +87,7 @@ flowchart TD
 
 ---
 
-## 🚀 **How to Run**
+## **How to Run**
 
 ### **Prerequisites**
 - **Python 3.10+**
@@ -118,7 +127,7 @@ cp -r gsoc-ml-poc/ml_required_phrases/ src/licensedcode/
 
 ---
 
-## 🤝 **Author & Contribution**
+## **Author & Contact**
 **Diksha Deware** — GSoC 2026 Applicant
 [GitHub](https://github.com/dikshaa2909) | [Proposal Repository](https://github.com/dikshaa2909/SCKT-POC)
 Applying for GSoC 2026 with the **AboutCode** community.
