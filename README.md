@@ -1,6 +1,6 @@
 # NLP → Required Phrase Marking Pipeline (Proof of Concept)
 
-> GSoC 2026 proof-of-concept for [Project: ML-Based Required Phrase Marking](https://github.com/dikshaa2909/GSoC-2026-ScanCode-Proposal)
+> GSoC 2026 proof-of-concept for [Project: ML-Based Required Phrase Marking]([https://github.com/dikshaa2909/GSoC-2026-ScanCode-Proposal](https://github.com/aboutcode-org/aboutcode/wiki/GSOC-2026-project-ideas#scancode-toolkit-project-ideas))
 
 ## Results
 
