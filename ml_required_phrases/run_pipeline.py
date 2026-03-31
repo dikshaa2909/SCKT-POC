@@ -46,9 +46,9 @@ from pathlib import Path
 
 def get_output_dir():
     """Get or create the output directory for pipeline artifacts."""
-    # In the PoC, we use a local results/ directory
+    # Write to local CWD's demo_results (e.g. ST root when installed)
     output_dir = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        os.getcwd(),
         'demo_results'
     )
     os.makedirs(output_dir, exist_ok=True)

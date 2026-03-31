@@ -1,26 +1,43 @@
 #!/bin/bash
 
 # Setup script for ScanCode ML Required Phrase Marking PoC
-# This script helps integrate the standalone PoC into your local scancode-toolkit fork.
+# Integrates the standalone PoC into your local scancode-toolkit clone.
 
-echo "🚀 Setting up ScanCode ML PoC..."
+# Resolve the absolute path of this PoC repository
+POC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-# 1. Verify we are in a ScanCode Toolkit clone
-if [ ! -d "src/licensedcode" ]; then
-    echo "❌ Error: Please run this script from the root of your scancode-toolkit clone."
+if [ -z "$1" ]; then
+    echo "Usage: ./setup_local.sh /path/to/scancode-toolkit"
     exit 1
 fi
 
-# 2. Create the target directory if it doesn't exist
-mkdir -p src/licensedcode/ml_required_phrases/
+SCANCODE_DIR="$1"
 
-# 3. Copy the ML module files
-echo "📦 Copying ML module files to src/licensedcode/ml_required_phrases/..."
-cp -r ../gsoc-ml-poc/ml_required_phrases/* src/licensedcode/ml_required_phrases/
+if [ ! -d "$SCANCODE_DIR/src/licensedcode" ]; then
+    echo "❌ Error: The provided path does not seem to be a valid scancode-toolkit clone."
+    exit 1
+fi
 
-# 4. Install dependencies
-echo "🐍 Installing ML dependencies..."
-pip install -r ../gsoc-ml-poc/requirements.txt
+echo "🚀 Setting up ScanCode ML PoC..."
 
-echo "✅ Setup complete! You can now run the pipeline using:"
+echo "📦 Copying ML module files into scancode-toolkit source..."
+mkdir -p "$SCANCODE_DIR/src/licensedcode/ml_required_phrases/"
+cp -r "$POC_DIR/ml_required_phrases/"* "$SCANCODE_DIR/src/licensedcode/ml_required_phrases/"
+
+echo "📦 Copying demo rules to ST root..."
+cp -r "$POC_DIR/demo_rules" "$SCANCODE_DIR/"
+
+echo "🐍 Checking python environment..."
+if [ -f "$SCANCODE_DIR/venv/bin/pip" ]; then
+    echo "   Using standard ScanCode configure venv..."
+    "$SCANCODE_DIR/venv/bin/pip" install -r "$POC_DIR/requirements.txt"
+else
+    echo "   Assuming virtualenv is active via pip..."
+    pip install -r "$POC_DIR/requirements.txt"
+fi
+
+echo "✅ Setup complete!"
+echo ""
+echo "You can now navigate to your ScanCode Toolkit directory and run the model."
+echo "cd $SCANCODE_DIR"
 echo "python3 src/licensedcode/ml_required_phrases/run_pipeline.py --help"
